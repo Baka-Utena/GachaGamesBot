@@ -110,7 +110,6 @@ function genshin(userid) {
     }
 
     function jobGenshin() {
-        console.log('5 '+ dateTemplateGenshin)
         cron.schedule(dateTemplateGenshin, () => {
             if (checkTransmutationDay(transmutationDay)) {
                 bot.sendMessage(userid, TEXT_GENSHIN);
@@ -119,7 +118,6 @@ function genshin(userid) {
     }
 
     function setJobGenshin() {
-        console.log('4 '+ time)
         if (checkTransmutationDay(transmutationDay)) {
             jobGenshin(userid);
             bot.sendMessage(userid, TEXT_GENSHIN);
@@ -143,14 +141,11 @@ function genshin(userid) {
         });
         bot.sendMessage(userid, 'В котором часу вам удобнее получать оповещения? (введите от 0 до 23): ');
         time = await getTime(userid);
-        console.log('1 '+ time)
         await new Promise((resolve, reject) => {
             dateTemplateGenshin = fillDateTemplate(time, transmutationDay);
             user.timeGenshin = fillDateTemplate(time, transmutationDay);
-            console.log('2 '+ time)
             resolve(true);
         })
-        console.log('3 '+ time)
     }
     bot.sendMessage(userid, 'Выберите день для оповещений об элементальном модификаторе:', {
         reply_markup: {
@@ -202,7 +197,6 @@ function sdorica(userid) {
     let dateTemplateSdorica = '0 0 0 * * *';
 
     function jobSdorica(userid) {
-        console.log('job' +dateTemplateSdorica)
         let job = cron.schedule(dateTemplateSdorica, () => {
             if (isLastLoginDay) {
                 if (isLastLoginDay) {
@@ -229,10 +223,8 @@ function sdorica(userid) {
                 if (result) {
                     time = text;
                     bot.sendMessage(userid, 'Выбрано время: ' + time + ' ч.');
-                    console.log('inner '+time)
                     dateTemplateSdorica = fillDateTemplate(time);
                     user.timeSdorica = dateTemplateSdorica;
-                    //return time;
                     bot.removeTextListener(regexp);
                     resolve(true);
                 } else {
