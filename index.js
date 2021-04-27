@@ -216,23 +216,6 @@ function sdorica(userid) {
     }
 
     let getChosenTime = async () => {
-/*        await new Promise((resolve, reject) => {
-            let regexp = /\d\d/;
-            bot.onText(regexp, (msg, text) => {
-                let result = (text && (text >= 0) && (text < 24));
-                if (result) {
-                    time = text;
-                    bot.sendMessage(userid, 'Выбрано время: ' + time + ' ч.');
-                    dateTemplateSdorica = fillDateTemplate(time);
-                    user.timeSdorica = dateTemplateSdorica;
-                    bot.removeTextListener(regexp);
-                    resolve(true);
-                } else {
-                    bot.sendMessage(userid, 'Введено некорректное значение');
-                    bot.removeTextListener(regexp);
-                }
-            })
-        })*/
         time = await getTime(userid);
         await new Promise((resolve, reject) => {
             dateTemplateSdorica = fillDateTemplate(time);
