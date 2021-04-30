@@ -1,31 +1,62 @@
 const TelegramBot = require('node-telegram-bot-api');
 const cron = require('node-cron');
+let mongoose = require('mongoose');
+const UserService = require('./userService');
 require('dotenv').config();
 
 const token = process.env.BOT_TOKEN;
-
 const bot = new TelegramBot(token, {polling: true});
+bot.on("polling_error", (m) => console.log(m));
+
+const url = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.zboym.mongodb.net/gachagames?retryWrites=true&w=majority`;
+const database = 'gachagames';
 
 let today = new Date();
-
 let user = {};
+const userService = new UserService;
 
 /*class MyBot extends TelegramBot(token, {polling: true}) {
-
 }*/
 
+mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true});
 
 bot.onText(/\/start/, (msg, match) => {
-    user.chatId = msg.chat.id;
-    user.firstName = msg.chat.first_name;
+    console.log(url);
+
+    const db = mongoose.connection;
+    db.on('error', console.error.bind(console, 'connection error:'));
+    db.on('open', function() {
+        console.log('We are live on ');
+        //let user = new userModel({telegramId: msg.chat.id});
+    });
+    userService.saveUser(msg.chat.id);
+
+    //const mongoClient = new MongoClient(url, { useNewUrlParser: true , useUnifiedTopology: true});/**/
+
+/*    mongoClient.connect(function(err, client){
+        console.log('We are live on ');
+        const db = mongoClient.db("gachagames");
+        const collection = db.collection("users");
+        console.log(collection);
+        collection.insertOne({
+            id: msg.chat.id
+        })
+    })*/
+/*    mongoClient.connect(function(err) {
+        const db = mongoClient.db("gachagames");
+        console.log("Connected successfully to server");
+
+        //console.log(db.collection("users"));
+        //mongoClient.close();
+    });*/
 });
 bot.onText(/\/genshin/, (msg, match) => {
-    user.chatId = msg.chat.id;
+    //userDB.setId(msg.chat.id);
     user.firstName = msg.chat.first_name;
     genshin(user.chatId);
 });
 bot.onText(/\/sdorica/, (msg, match) => {
-    user.chatId = msg.chat.id;
+    //userDB.setId(msg.chat.id);
     user.firstName = msg.chat.first_name;
     sdorica(user.chatId);
 });
@@ -38,6 +69,14 @@ function fillDateTemplate(hour = '0', weekday = '*') {
     let dateTemplate = '';
     dateTemplate = `0 0 ${hour} * * ${weekday}`;
     return dateTemplate;
+}
+
+function writeToDB(userid) {
+    usersRef.set({
+        userid: {
+            timeSdorica: '0 0 19 * * *'
+        }
+    })
 }
 
 function getTime(userid) {          // TO DO - дописать обработку ввода (ошибочные значения и т д)
