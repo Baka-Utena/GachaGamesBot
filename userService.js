@@ -1,51 +1,66 @@
-const firebase = require('firebase');
-const MongoClient = require('mongodb').MongoClient;
 const mongoose = require('mongoose');
 
-//const ref = firebase.database().ref();
-//const usersRef = ref.child("users/");
-
-let Schema = mongoose.Schema;
-let UserSchema = new Schema({
-        telegramId: String
-    }, {
-    collection: "users"
-});
-let userModel = mongoose.model('user', UserSchema);
-
 module.exports = class UserService {
-/*    id: '',
-    name: '',
-    timeSdorica: '',
-    timeGenshin: '',*/
+    constructor() {
+        this.Schema = mongoose.Schema;
+        this.UserSchema = new this.Schema({
+            telegramId: String,
+            telegramFirstName: String,
+            telegramLastName: String,
+            telegramUsername: String,
+            timeSdorica: String,
+            timeGenshin: String,
+            steamID: String,
 
-/*const app = firebase.initializeApp({
-    apiKey: "AIzaSyBwDCFDJQetTqCv26e-f3l8F9ar4E7txY0",
-    authDomain: "gachagamesbot.firebaseapp.com",
-    databaseURL: "https://gachagamesbot-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "gachagamesbot",
-    storageBucket: "gachagamesbot.appspot.com",
-    messagingSenderId: "1010486935152",
-    appId: "1:1010486935152:web:f2abb4012ac890c2ab3eb5"
-})*/
+        }, {
+            collection: "users"
+        });
+        this.UserModel = mongoose.model('user', this.UserSchema);
+    }
 
-    isNewUser(userid) {
-        userModel.exists({'telegramId': userid})
-        console.log(!!(userModel.exists({'telegramId': userid})));
-        return true;
+    async isExistingUser(userid) {
+        return await this.UserModel.exists({'telegramId': userid})
+    };
+    async isExistingProperty(userid, property) {
+        return await this.UserModel.exists({property: null}).catch(err => console.log(err));
     };
 
-    saveUser(userid) {
-        if (this.isNewUser()) {
-            console.log('это новый пользователь');
-            const user = new userModel({'telegramId': userid});
-        }
-/*        const user = new userModel({'telegramId': userid});
-        user.save();
-        userModel.findOne({'telegramId': userid}, function (err, user) {
-                if (err) return console.error(err);
-            console.log(user.telegramId);
-        })*/
+    async getSteamIDs() {
+        let users = await this.UserModel.find({}, 'steamID');
+        return users
+            .filter(item => item.steamID)
+            .map(item => item.steamID);
+    }
 
+    async saveUser(userData) {
+        if (await this.isExistingUser(userData.id)) {
+            console.log('это существующий пользователь');
+        } else {
+            console.log(await this.isExistingUser(userData.id));
+            let user = new this.UserModel({
+                'telegramId': userData.id,
+                'telegramFirstName': userData.first_name,
+                'telegramLastName': userData.last_name,
+                'telegramUsername': userData.username
+            });
+            await user.save();
+            console.log(await this.isExistingUser(userData.id));
+        }
+    }
+
+    async updateProperty(userData, property, value) {
+        if (await this.isExistingUser(userData.id)) {
+            console.log('это существующий пользователь');
+        } else {
+            await this.saveUser(userData.id);
+        }
+        let user = await this.UserModel.findOne({'telegramId': userData.id});
+        await user.updateOne({ [property]: value });
+        console.log(user);
+        /*
+				userModel.findOne({'telegramId': userData}, function (err, user) {
+						if (err) return console.error(err);
+					console.log(user.telegramId);
+				})*/
     }
 };

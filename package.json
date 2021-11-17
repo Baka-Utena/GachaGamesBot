@@ -10,12 +10,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@genshin-kit/core": "^2.5.0",
     "dotenv": "^8.2.0",
-    "firebase": "^8.4.2",
-    "mongodb": "^3.6.6",
-    "mongoose": "^5.12.6",
+    "mongoose": "^6.0.12",
     "node-cron": "^3.0.0",
-    "node-telegram-bot-api": "0.52.0"
+    "node-telegram-bot-api": "0.52.0",
+    "steamapi": "^2.2.0"
   },
   "devDependencies": {},
   "description": ""
